@@ -88,15 +88,22 @@ where
                     return None;
                 }
             } else {
-                window.extend_from_slice(&self.buffer[self.stride..]);
-                for _ in 0..self.stride {
-                    match self.iter.next() {
-                        Some(item) => { window.push(item); }
-                        None => break,
-                    }
-                }
-                if window.is_empty() {
-                    return None;
+                match self.buffer.get(self.stride..) {
+                    Some(slice) => {
+                        window.extend_from_slice(slice);
+                        for _ in 0..self.stride {
+                            match self.iter.next() {
+                                Some(item) => { window.push(item); }
+                                None => break,
+                            }
+                        }
+                        if window.is_empty() {
+                            return None;
+                        }
+                    },
+                    None => {
+                        return None;
+                    },
                 }
             }
             self.buffer = window.clone();
