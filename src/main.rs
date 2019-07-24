@@ -1,4 +1,4 @@
-use sliding_windows::*;
+use slide_split::*;
 use structopt::StructOpt;
 use std::path::PathBuf;
 use std::fs::File;
@@ -14,6 +14,11 @@ fn execute_sliding_windows<R: BufRead>(reader: &mut R, opt: Opt) {
             Box::new(sliding_windows_from_iter(iter, opt.width, opt.stride))
         };
     for (number, window) in iter.enumerate() {
+        if let Some(max_windows) = opt.max_windows {
+            if number >= max_windows {
+                break;
+            }
+        }
         let file_name = format!("{}{:0digits$}", opt.prefix, number, digits=opt.digits);
         let file = File::create(file_name).unwrap();
         let mut writer = BufWriter::new(file);
@@ -33,6 +38,8 @@ struct Opt {
     width: usize,
     #[structopt(short="s", long="stride")]
     stride: usize,
+    #[structopt(short="m", long="max-windows")]
+    max_windows: Option<usize>,
     #[structopt(short="e", long="exact")]
     exact: bool,
     #[structopt(name="FILE", parse(from_os_str))]

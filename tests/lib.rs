@@ -1,4 +1,4 @@
-use sliding_windows::*;
+use slide_split::*;
 
 fn compare_slice_and_iter(width: usize, stride: usize) {
     let a: Vec<usize> = (0..1000).collect();
